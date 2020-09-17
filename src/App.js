@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './App.css';
-import 'antd/dist/antd.css'
 
+import 'antd/dist/antd.css';
+import './styles/main.scss';
 import { HashRouter,Switch,Route } from 'react-router-dom'
-import About from './views/About'
-import Home from './views/Home'
+import Index from './views/login/Index'
+
 
 class App extends Component{
     constructor(){
@@ -13,12 +13,14 @@ class App extends Component{
     }
     render(){
       return (
-        <HashRouter>
-            <Switch>
-                <Route exact path="/" component = {Home}></Route>
-                <Route path="/about" component = {About}></Route>
-            </Switch>
-        </HashRouter>  
+        <div className="test">
+            <HashRouter>
+                <Switch>
+                    <Route exact path="/" component = {Index}></Route>
+                    
+                </Switch>
+            </HashRouter>  
+        </div>  
       )
     }
 }

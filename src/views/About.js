@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-
-
+import './aaa.scss'
 
 class About extends Component{
     constructor(){
@@ -10,7 +9,9 @@ class About extends Component{
       }
     }
     render(){
-      return (<div>About</div>)
+      return (<div>
+          1231
+      </div>)
     }
 }
 
