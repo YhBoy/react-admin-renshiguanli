@@ -1,13 +1,14 @@
 import axios from 'axios';
 
 const service = axios.create({
-    baseURL:'/devApi',
+    baseURL:process.env.REACT_APP_API,
     timeout:3000
 })
 
 // 请求拦截器
 service.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
+    console.log(process.env.NODE_ENV)
     return config;
   }, function (error) {
     // 对请求错误做些什么

@@ -3,8 +3,11 @@ import React, { Component } from 'react';
 import 'antd/dist/antd.css';
 import './styles/main.scss';
 import { HashRouter,Switch,Route } from 'react-router-dom'
-import Index from './views/login/Index'
+import Login from './views/login/Index'
+import Index from './views/index/Index'
 
+// 引入私有组件
+import PrivateRouter from "./components/privateRouter/index";
 
 class App extends Component{
     constructor(){
@@ -13,14 +16,12 @@ class App extends Component{
     }
     render(){
       return (
-        <div className="test">
-            <HashRouter>
-                <Switch>
-                    <Route exact path="/" component = {Index}></Route>
-                    
-                </Switch>
-            </HashRouter>  
-        </div>  
+          <HashRouter>
+              <Switch>
+                  <Route exact path="/"  render={()=> <Login />} ></Route>
+                  <PrivateRouter exact path="/index" component = {Index} />
+              </Switch>
+          </HashRouter>  
       )
     }
 }

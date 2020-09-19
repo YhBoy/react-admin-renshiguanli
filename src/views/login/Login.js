@@ -1,26 +1,65 @@
 import React, { Component, Fragment } from 'react';
-import { Form, Input, Button ,Row,Col } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { LoginForm } from '../../api/account'
+import {withRouter} from 'react-router-dom'
+
+import { setToken } from '../../utils/session'
+
+import { Form, Input, Button ,Row,Col,message } from 'antd';
+import { UserOutlined, LockOutlined  } from '@ant-design/icons';
+
+// 加密
+import CryptoJs from 'crypto-js'
+
+// 组件
+import  Code  from '../../components/Code/index.js' 
+
+import { LoginForm  } from '../../api/account'
 class Login extends Component{
     constructor(props){
         super()
-        this.state = {}
+        this.state = {
+            username:'',
+            module:'login',
+            password:'',
+            code:'',
+            loading:false
+            // username:'409019683@qq.com',
+            // code_button_loading:false,
+            // code_button_text:"获取验证码",
+            // code_button_disabled:false
+        }
     }
    
-    onFinish = values => {
+    onFinish = (e,values) => {
+        e.preventDefault()
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                const result = {
+                    username:this.state.username,
+                    password:CryptoJs.MD5(this.state.password).toString(),
+                    code:this.state.code
+                }
+                this.setState({
+                    loading:true
+                })
                 
-                LoginForm().then(res=>{
-                        console.log(res)
+                LoginForm(result).then(res=>{
+                        message.info(res.data.message)
+                        this.setState({
+                            loading:false
+                        })
+                        setToken(res.data.data.token)
+                        this.props.history.push('/index')
+                        
                 }).catch(err=>{
+                    this.setState({
+                        loading:false
+                    })
                     console.log(err)
                 })
             }
         });
-
     }
+
     toggleForm =()=>{
         this.props.switchForm('resisterForm')
     }
@@ -28,9 +67,29 @@ class Login extends Component{
         if (value === '') {
             callback('密码不能为空')
         }else{
+            
             callback();
         }
     }
+
+    inputPassword = (e)=>{
+        this.setState({
+            password:e.target.value
+        })
+    }
+
+    // 处理input 输入事件
+    inputChange =(e)=>{
+        this.setState({
+            username:e.target.value
+        })
+    }
+    inputCode=(e)=>{
+        this.setState({
+            code:e.target.value
+        })
+    }
+
     render(){
         const { getFieldDecorator } = this.props.form;
         return (<Fragment >
@@ -39,23 +98,24 @@ class Login extends Component{
                     <h4 className="column">登录</h4>
                     <span onClick={this.toggleForm}>账号注册</span>
                 </div>
-                <Form onClick={this.onFinish}  name="normal_login" className="login-form">
-                    <Form.Item name="username"  >
+                <Form onSubmit={this.onFinish}   name="normal_login" className="login-form">
+                    <Form.Item   >
                         {getFieldDecorator('username', {
+                            initialValue:this.state.username,
                             rules: [{ required: true, message: '用户名不能为空' }],
                         })(
-                            <Input autoComplete="off" prefix={<UserOutlined className="site-form-item-icon" />} placeholder="username" />
+                            <Input onChange={this.inputChange} autoComplete="off"  prefix={<UserOutlined className="site-form-item-icon" />} placeholder="username" />
                         )}
                     </Form.Item>
                     <Form.Item name="password"  >
-                            {getFieldDecorator('passwordcomfire', {
+                            {getFieldDecorator('password', {
                                 rules: [{
                                 required: true,
                                 message: '密码不能为空',
                             }, {validator: this.passwordValidator
                             }],
                             })(
-                                <Input  prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Password" />
+                                <Input onChange={this.inputPassword}  prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Password" />
                             )}
                     </Form.Item>
                     <Form.Item name="code"  rules={[{ required: true, message: '请输入验证码' }]} >
@@ -67,16 +127,16 @@ class Login extends Component{
                                 message: '验证码不能为空',
                             }],
                             })(
-                                <Input  prefix={<LockOutlined className="site-form-item-icon" />} type="code" placeholder="请输入验证码" />
+                                <Input onChange={this.inputCode} prefix={<LockOutlined className="site-form-item-icon" />} type="code" placeholder="请输入验证码" />
                             )} 
                             </Col>
                             <Col span={8} offset={2}>
-                                <Button type="danger">获取验证码</Button>
+                                <Code user = {this.state.username} module = {this.state.module}></Code>
                             </Col>
                         </Row>    
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        <Button loading={this.state.loading} style={{width:'100%'}} type="primary" htmlType="submit" className="login-form-button">
                         登录
                         </Button>
                     </Form.Item>
@@ -86,4 +146,4 @@ class Login extends Component{
     }
 }
 
-export default Form.create({})(Login);
+export default withRouter(Form.create({})(Login));
