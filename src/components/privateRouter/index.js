@@ -3,13 +3,16 @@ import { Route,Redirect } from 'react-router-dom'
 
 import { getToken } from '../../utils/session'
 
-const privateRouter = ({ component: Component, ...rest }) => (
-    // Component 从父组件传递过来的 组件名称 
-    // ...rest接收组件的属性   如 path  key 
-    <Route {...rest} render={props => (
-        getToken()?<Component {...props}/>:<Redirect to="/" />
-    )}/>
-  )
-  
+const PrivateRouter = ({ component: Component, ...rest }) => {
+  return (
+    <Route {...rest} render={routeProps => (
+      getToken() ? <Component {...routeProps} /> : <Redirect to="/" />
+    )} />
+  );
+}
+export default PrivateRouter;
 
-export default privateRouter;
+
+
+
+

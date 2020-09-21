@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import User from '../../views/user/index.js'
+import User from '../../views/user/Index.js'
 import UserAdd from '../../views/user/Add.js'
 import { Switch } from 'react-router-dom'
 // 私有路由组件

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import 'antd/dist/antd.css';
 import './styles/main.scss';
-import { HashRouter,Switch,Route } from 'react-router-dom'
+import { BrowserRouter,Switch,Route } from 'react-router-dom'
 import Login from './views/login/Index'
 import Index from './views/index/Index'
 
@@ -16,12 +16,12 @@ class App extends Component{
     }
     render(){
       return (
-          <HashRouter>
+          <BrowserRouter>
               <Switch>
                   <Route exact path="/"  render={()=> <Login />} ></Route>
-                  <PrivateRouter exact path="/index" component = {Index} />
+                  <PrivateRouter path="/index" component = {Index} />
               </Switch>
-          </HashRouter>  
+          </BrowserRouter>  
       )
     }
 }
