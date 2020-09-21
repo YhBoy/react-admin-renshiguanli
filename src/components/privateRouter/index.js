@@ -10,5 +10,6 @@ const privateRouter = ({ component: Component, ...rest }) => (
         getToken()?<Component {...props}/>:<Redirect to="/" />
     )}/>
   )
+  
 
 export default privateRouter;

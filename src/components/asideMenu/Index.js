@@ -1,16 +1,34 @@
 
 import React,{ Component, Fragment } from 'react'
 import {  Menu } from 'antd';
-import { UserOutlined  } from '@ant-design/icons';
+// import { UserOutlined  } from '@ant-design/icons';
+import Router from '../../routes/index'
+import {Link} from 'react-router-dom';
 
 const { SubMenu } = Menu;
 class AsideMenu extends Component{
     constructor(props){
         super()
     }
+    renderSubMenu=({title,key,child})=>{
+        // 这个是有二级菜单的  里面还包括了  判断 二级菜单里面是否还有 child 递归调用一下
+        return (
+            <SubMenu key={key}  title={title}>
+                 {
+                    child&&child.map((item)=>{
+                        return item.child&&item.child.length > 0 ?  this.renderSubMenu(item) : this.renderMenu(item)
+                    }) 
+                 }
+            </SubMenu>
+        )
+    }
+    renderMenu=(data)=>{
+        return (<Menu.Item  key={data.key}> <Link to={data.key}> {data.title} </Link></Menu.Item>)
+    }
     render(){
         return (
             <Fragment>
+                    
                     <Menu
                         theme="dark"
                         mode="inline"
@@ -18,13 +36,12 @@ class AsideMenu extends Component{
                         defaultOpenKeys={['sub1']}
                         style={{ height: '100%' }}
                     >
-                        <Menu.Item key="0">控制台</Menu.Item>    
-                        <SubMenu key="sub1" icon={<UserOutlined />} title="subnav 1">
-                            <Menu.Item key="1">option1</Menu.Item>
-                            <Menu.Item key="2">option2</Menu.Item>
-                            <Menu.Item key="3">option3</Menu.Item>
-                            <Menu.Item key="4">option4</Menu.Item>
-                        </SubMenu>
+                        {
+                            Router&&Router.map((firstItem)=>{
+                                return firstItem.child && firstItem.child.length > 0 ? this.renderSubMenu(firstItem) : this.renderMenu(firstItem)
+                                //  firstItem.child && firstItem.child.length 存在且大于0 说明有子级否则没有
+                            })
+                        }
                     </Menu>
             </Fragment>    
         );

@@ -1,46 +1,65 @@
-// 路由分为两类
-import Login from '../pages/Login';
-import List from '../pages/admin/products/List'
-
-import PageNotFound from '../pages/PageNotFound'
-import Edit from '../pages/admin/products/Edit'
-import Index from '../pages/admin/dashboard/index'
-export const mainRoutes = [
+const router = [
     {
-        path:'/login',
-        component:Login
+        title:"控制台",
+        icon:'laptop',
+        key:'/index'
     },
     {
-        path:'/404',
-        component:PageNotFound
+        title:'用户管理',
+        icon:'laptop',
+        key:'/index/user',
+        child:[
+            {
+                key:'/index/user/list',
+                title:"用户列表",
+                icon:''
+            },
+            {
+                key:'/index/user/add',
+                title:"添加用户",
+                icon:''
+            }
+        ]
+    },
+    {
+        title:'部门管理',
+        icon:'bar',
+        key:'/home/navigation',
+        child:[
+            {title:'部门列表',icon:'',key:'/home/navigation/dropdown'},
+            {title:'添加部门',icon:'',key:'/home/navigation/menu',}
+        ]
+    },
+    {
+        title:"职位管理",
+        icon:'edit',
+        key:'/home/entry',
+        child:[
+            {
+                title:"职位列表",
+                icon:'',
+                key:'/home/entry/form/basic-from',
+            },
+            {
+                title:"添加职位",
+                icon:'',
+                key:'/home/entry/form/step-form',
+            }
+        ]
+    },
+    {
+        title:'请假',
+        icon:'info-circle-o',
+        key:'/home/about',
+    },
+    {
+        title:'加班',
+        icon:'info-circle-o',
+        key:'/home/about1',
     }
 ]
 
-export const adminRoutes = [
-    {
-        path:'/admin/dashboard',
-        component:Index,
-        title:'看板',
-        isShow:true,
-        icon:'<AreaChartOutlined />'
-    },
-    {
-        path:'/admin/products',
-        component:List,
-        title:'商品管理',
-        isShow:true,
-        icon:'shop'
-    },
-    {
-        path:'/admin/products/edit/:id?',
-        component:Edit,
-        title:'商品编辑',
-        isShow:true
-    }
-]
-
-
-
+export default router
 
 
 
