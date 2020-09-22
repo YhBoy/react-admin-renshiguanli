@@ -55,6 +55,7 @@ class Code extends Component{
                 code_button_loading:false,
                 code_button_text:'重新获取'
             })
+            console.log('获取失败')
         })
     }
 

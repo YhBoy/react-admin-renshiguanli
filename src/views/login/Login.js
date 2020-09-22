@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import {withRouter} from 'react-router-dom'
 
-import { setToken } from '../../utils/session'
+import { setToken,setUsername } from '../../utils/cookie'
 
 import { Form, Input, Button ,Row,Col,message } from 'antd';
 import { UserOutlined, LockOutlined  } from '@ant-design/icons';
@@ -47,7 +47,9 @@ class Login extends Component{
                         this.setState({
                             loading:false
                         })
+                        
                         setToken(res.data.data.token)
+                        setUsername(res.data.data.username)
                         this.props.history.push('/index')
                         
                 }).catch(err=>{
