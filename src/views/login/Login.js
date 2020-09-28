@@ -29,37 +29,38 @@ class Login extends Component{
         }
     }
    
-    onFinish = (e,values) => {
-        e.preventDefault()
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                const result = {
-                    username:this.state.username,
-                    password:CryptoJs.MD5(this.state.password).toString(),
-                    code:this.state.code
-                }
+    onFinish = (values) => {
+        debugger
+        // const result = {
+        //     username:this.state.username,
+        //     password:CryptoJs.MD5(this.state.password).toString(),
+        //     code:this.state.code
+        // }
+        const result = {
+            username:values.username,
+            password: CryptoJs.MD5(values.password).toString(),
+            code:values.code
+        }
+        this.setState({
+            loading:true
+        })
+        
+        LoginForm(result).then(res=>{
+                message.info(res.data.message)
                 this.setState({
-                    loading:true
+                    loading:false
                 })
+                debugger
+                setToken(res.data.data.token)
+                setUsername(res.data.data.username)
+                this.props.history.push('/index')
                 
-                LoginForm(result).then(res=>{
-                        message.info(res.data.message)
-                        this.setState({
-                            loading:false
-                        })
-                        
-                        setToken(res.data.data.token)
-                        setUsername(res.data.data.username)
-                        this.props.history.push('/index')
-                        
-                }).catch(err=>{
-                    this.setState({
-                        loading:false
-                    })
-                    console.log(err)
-                })
-            }
-        });
+        }).catch(err=>{
+            this.setState({
+                loading:false
+            })
+            console.log(err)
+        })
     }
 
     toggleForm =()=>{
@@ -93,44 +94,23 @@ class Login extends Component{
     }
 
     render(){
-        const { getFieldDecorator } = this.props.form;
         return (<Fragment >
             <div className='form-box'>
                 <div className="form-header">
                     <h4 className="column">登录</h4>
                     <span onClick={this.toggleForm}>账号注册</span>
                 </div>
-                <Form onSubmit={this.onFinish}   name="normal_login" className="login-form">
-                    <Form.Item   >
-                        {getFieldDecorator('username', {
-                            initialValue:this.state.username,
-                            rules: [{ required: true, message: '用户名不能为空' }],
-                        })(
-                            <Input onChange={this.inputChange} autoComplete="off"  prefix={<UserOutlined className="site-form-item-icon" />} placeholder="username" />
-                        )}
+                <Form onFinish={this.onFinish}   name="normal_login" className="login-form">
+                    <Form.Item  name="username" >
+                        <Input onChange={this.inputChange} autoComplete="off"  prefix={<UserOutlined className="site-form-item-icon" />} placeholder="username" />
                     </Form.Item>
                     <Form.Item name="password"  >
-                            {getFieldDecorator('password', {
-                                rules: [{
-                                required: true,
-                                message: '密码不能为空',
-                            }, {validator: this.passwordValidator
-                            }],
-                            })(
-                                <Input onChange={this.inputPassword}  prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Password" />
-                            )}
+                            <Input onChange={this.inputPassword}  prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Password" />
                     </Form.Item>
                     <Form.Item name="code"  rules={[{ required: true, message: '请输入验证码' }]} >
                         <Row span={20} >
                             <Col span={14} >
-                            {getFieldDecorator('code', {
-                                rules: [{
-                                required: true,
-                                message: '验证码不能为空',
-                            }],
-                            })(
                                 <Input onChange={this.inputCode} prefix={<LockOutlined className="site-form-item-icon" />} type="code" placeholder="请输入验证码" />
-                            )} 
                             </Col>
                             <Col span={8} offset={2}>
                                 <Code user = {this.state.username} module = {this.state.module}></Code>
@@ -148,4 +128,4 @@ class Login extends Component{
     }
 }
 
-export default withRouter(Form.create({})(Login));
+export default withRouter(Login);

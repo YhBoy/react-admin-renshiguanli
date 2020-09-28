@@ -91,12 +91,16 @@
     ]
   },
   "devDependencies": {
+    "antd": "^4.6.5",
+    "axios": "^0.20.0",
     "crypto-js": "^4.0.0",
     "css-loader": "^3.4.2",
     "http-proxy-middleware": "^1.0.5",
     "node-sass": "^4.14.1",
     "react-cookie": "^4.0.3",
+    "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
+    "redux": "^4.0.5",
     "sass-loader": "^10.0.2",
     "sass-resources-loader": "^2.1.0"
   },

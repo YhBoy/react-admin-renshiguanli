@@ -24,25 +24,24 @@ class RegisterForm extends Component{
     }
    
      onFinish = values => {
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                const result = {
-                    username:this.state.username,
-                    password:CryptoJs.MD5(this.state.password).toString(),
-                    code:this.state.code
-                }
-                register(result).then(res=>{
-                    console.log(res)
-                    message.info("注册成功,即将跳转到登录页")
-                    setTimeout(()=>{
-                        this.props.switchForm('login')
-                    },3000)
-                    
-                }).catch(err=>{
-                    console.log(err)
-                })
-            }
-        });
+        
+        const result = {
+            username:values.username,
+            password: CryptoJs.MD5(values.password).toString(),
+            code:values.code
+        }
+        console.log(result)
+
+        register(result).then(res=>{
+            console.log(res)
+            message.info("注册成功,即将跳转到登录页")
+            setTimeout(()=>{
+                this.props.switchForm('login')
+            },3000)
+            
+        }).catch(err=>{
+            console.log(err)
+        })
     }
     toggleForm = ()=>{
         this.props.switchForm('login')
@@ -57,86 +56,32 @@ class RegisterForm extends Component{
             callback()
         }
     }
-    // passwordAgainValidator=( rule, value, callback )=>{
-        
-    //     if( value === ''){
-    //         callback('密码不能为空')
-    //     }else if( value.length <= 3 ){
-    //         callback('密码长度必须大于3位')
-    //     }else if( this.state.password !== this.state.passwords ){
-    //         callback('两次输入密码不一样')
-    //     }else {
-    //         callback()
-    //     }
-    // }
-    // inputPasswords=(e)=>{
-    //     console.log(e.target.value)
-    //     this.setState({
-    //         passwords:e.target.value
-    //     })
-    // }
-    inputPassword=(e)=>{
-        this.setState({
-            password:e.target.value
-        })
-    }
-    inputUsername=(e)=>{
-        console.log(e.target.value)
-        this.setState({
-            username:e.target.value
-        })
-    }
-    inputCode=(e)=>{
-        this.setState({
-            code:e.target.value
-        })
-    }
     render(){
-        const { getFieldDecorator } = this.props.form;
     return (<Fragment >
         <div className='form-box'>
             <div className="form-header">
                 <h4 className="column">注册</h4>
                 <span onClick={this.toggleForm}>账号登录</span>
             </div>
-            <Form onSubmit={this.onFinish}  name="normal_login" className="login-form"    >
-                        <Form.Item   >
-                            {getFieldDecorator('username', {
-                                    rules: [{
-                                    required: true,
-                                    message: '用户名不能为空',
-                                }],
-                            })(
-                                <Input onChange={this.inputUsername} prefix={<UserOutlined className="site-form-item-icon" />} placeholder="请输入邮箱" />
-                            )}
+            <Form onFinish={this.onFinish}  name="normal_login" className="login-form"    >
+                        <Form.Item   name="username" rules={
+                                [
+                                    {require:true, message:'邮箱账号不能为空'},
+                                    {type:"email",message:'邮箱合适不正确' }
+                                ]
+                            }>
+                            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="请输入邮箱" />
                         </Form.Item>
-                        <Form.Item   >
-                            {getFieldDecorator('password', {
-                                    initialValue:this.state.password,
-                                    rules: [{
-                                    required: true
-                                }, {validator: this.passwordValidator
-                                }],
-                            })(
-                                <Input onChange={this.inputPassword}  prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="请输入密码" />
-                            )}
+                        <Form.Item  name="password" >
+                            <Input   prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="请输入密码" />
                         </Form.Item>
-                        {/* <Form.Item    >
-                            {getFieldDecorator('passwords', {
-                                    initialValue:this.state.passwords,
-                                    rules: [{
-                                    required: true
-                                }, {validator: this.passwordAgainValidator
-                                }],
-                            })(
-                                <Input onChange={this.inputPasswords}  prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="请在此输入密码" />
-                            )}
-                            
-                        </Form.Item> */}
+                        <Form.Item  name="passwords" >
+                            <Input   prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="请输入密码" />
+                        </Form.Item>
                         <Form.Item name="code"  rules={[{ required: true, message: '请输入验证码' }]} >
                             <Row span={20} >
                                 <Col span={14} >
-                                    <Input onChange={this.inputCode}  prefix={<LockOutlined className="site-form-item-icon" />} type="code" placeholder="请输入验证码" />
+                                    <Input prefix={<LockOutlined className="site-form-item-icon" />} type="code" placeholder="请输入验证码" />
                                 </Col>
                                 <Col span={8} offset={2}>
                                     <Code user={this.state.username}  module={this.state.module} ></Code>
@@ -154,4 +99,4 @@ class RegisterForm extends Component{
     }
 }
 
-export default Form.create({})(RegisterForm);
+export default RegisterForm;

@@ -11,11 +11,23 @@ export function departmentAddApi(data){
 }
 
 
-export function departmentListApi(){
+export function departmentListApi(data){
     return service.request({
-        url:'/department/list',
-        method:'get',
-         // post 请求参数
+        url:'/department/list/',
+        method:'post',
+        data // post 请求参数
+        // params:data // get 请求参数
+    })
+}
+
+// 删除
+
+
+export function departmentDeleteApi(data){
+    return service.request({
+        url:'/department/delete/',
+        method:'post',
+        data // post 请求参数
         // params:data // get 请求参数
     })
 }

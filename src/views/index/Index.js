@@ -44,7 +44,7 @@ class Index extends Component{
                    <ContentMain />
                 </div>
               </Content>
-              <Footer style={{ textAlign: 'center' }}>底部导航..111111.</Footer>
+              <Footer style={{ textAlign: 'center' }}>底部导航...</Footer>
             </Layout>
           </Layout>)
     }

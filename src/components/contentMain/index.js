@@ -8,7 +8,7 @@ import User from '../../views/user/Index.js'
 import UserAdd from '../../views/user/Add.js'
 
 // 部门
-import DepartmentIndex from '../../views/department/Index'
+import DepartmentList from '../../views/department/List'
 import DepartmentAdd from '../../views/department/Add'
 
 class  contentMain extends Component {
@@ -21,9 +21,8 @@ class  contentMain extends Component {
             <Switch>
                 <PrivateRouter exact path="/index/user/list" component = {User} />
                 <PrivateRouter exact path="/index/user/add"  component = {UserAdd} />
-
                 <PrivateRouter exact path="/index/department/add"  component = {DepartmentAdd} />
-                <PrivateRouter exact path="/index/department/list"  component = {DepartmentIndex} />
+                <PrivateRouter exact path="/index/department/list"  component = {DepartmentList} />
             </Switch>    
         )
     }
