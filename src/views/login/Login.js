@@ -30,6 +30,7 @@ class Login extends Component{
     }
    
     onFinish = (values) => {
+        console.log(values)
         debugger
         // const result = {
         //     username:this.state.username,

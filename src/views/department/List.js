@@ -1,45 +1,119 @@
 
 import React,{Component, Fragment} from 'react';
 
-import {Button,Input,Form, Table, Switch} from 'antd';
-import { departmentListApi } from "../../api/department"
+import {Button,Input,Form, Table, Switch, message,Modal} from 'antd';
+import { departmentListApi ,departmentDeleteApi ,departmentStatusApi} from "../../api/department"
+import { Link } from 'react-router-dom';
+import TableComponents from '../../components/tableData/index'
+
+import requestUrl from '../../api/requestUrl'
 
 class DepartmentList extends Component{
     constructor(props){
         super()
         this.state = {
+            loadingTable:false,
             pageSize:1,
+            total:'',
             pageNumber:10,
             // 点击全选  得到的id 数组
             selectedRowKeys:[],
+            visible:false,
             keyWork:'',
-            columns:[
-                {title:'部门名称',dataIndex:"name",key:'name'},
-                {title:'禁启用',dataIndex:"status",key:'status',render(text,row) {
-                    return <Switch checkedChildren="开启" unCheckedChildren="关闭" defaultChecked={row.status === 1 ? true : false}  />
-                },},
-                {title:'人员数量',dataIndex:"number",key:'number'},
-                {title:'操作',dataIndex:"operation",key:'operation',width:230,render(text,rowData) {
-                    return (
-                        <div>
-                            <Button onClick={ ()=>this.handleEdit(rowData.id) } type="primary">编辑</Button>
-                            <Button >删除</Button>
-                        </div>
-                    )
-                }}
-            ],
+            id:'',
+            flag:false,
+            loading:false,
+            batchButton:true,
+            tableConfig:{
+                
+                url:requestUrl.departmentList,
+                thead:[
+                        {title:'部门名称',dataIndex:"name",key:'name'},
+                        {title:'禁启用',dataIndex:"status",key:'status',render:(text,row)=>{
+                            return <Switch 
+                                onChange={ ()=>this.onHandleSwitch(row.id,row.status) }
+                                checkedChildren="开启" 
+                                unCheckedChildren="关闭" 
+                                loading = { this.state.flag  }
+                                defaultChecked={row.status == 1 ? true : false}  />
+                            }
+                        },
+                        {title:'人员数量',dataIndex:"number",key:'number'},
+                        {title:'操作',dataIndex:"operation",key:'operation',width:230, render:(text,row)=>{
+                            return (
+                                <div>
+                                    <Button  type="primary">
+                                        <Link to={{pathname:"/index/department/add",state:{id:row.id}}}>编辑</Link>
+                                    </Button>
+                                    <Button style={{marginLeft:"10px"}} type="danger" onClick={ ()=> this.onHandleDelete(row.id) }>删除</Button>
+                                </div>
+                            )
+                        } }
+                    ],
+                },
             dataSource:[]
+            
         }
     }
     
     componentWillMount(){
         this.loadData()
     }
-    handleEdit=(id)=>{
-        console.log(id)
+    
+    onHandleSwitch=(id,status)=>{
+        console.log(id,status)
+        if(!id ) return ;
+        if(this.state.flag){ return }
+        this.setState({
+            flag:true
+        })
+        
+        const result = {
+            id,
+            status:status=="1"? false : true
+        }
+        
+        departmentStatusApi(result).then(res=>{
+            message.info(res.data.message)
+            this.setState({
+                flag:false
+            })
+            this.loadData()
+        }).catch(err=>{
+            console.log(err)
+            this.setState({
+                flag:false
+            })
+        })
     }
-    handleDelete=()=>{
-        console.log(111)
+    onHandleDelete=(id)=>{
+        if(!id) return ;
+        this.setState({
+            visible:true,
+            id
+        })
+        
+    }
+    onShowSizeChange=()=>{
+        
+    }
+    
+    deleteAll=()=>{
+        if( this.state.selectedRowKeys.length <= 0 ){
+            message.info('删除元素不能为空')
+            return
+        }
+        const result = {
+            id:this.state.selectedRowKeys.join(',')
+        }
+        
+        departmentDeleteApi(result).then(res=>{
+            message.info(res.data.message)
+            this.loadData()
+        }).catch(err=>{
+            console.log(err)
+        })
+        
     }
     loadData=()=>{
         // console.log(typeof (this.state.pageSize))
@@ -48,15 +122,29 @@ class DepartmentList extends Component{
             pageNumber:1,
             pageSize:10
         }
+        this.setState({
+            loadingTable:true
+        })
         departmentListApi(result).then(res=>{
+            
             if(res.data.data.data.length > 0){
                 this.setState({
-                    dataSource:res.data.data.data
+                    dataSource:res.data.data.data,
+                    total:res.data.data.total
+                })
+            }else{
+                this.setState({
+                    dataSource:[]
                 })
             }
-            
+            this.setState({
+                loadingTable:false
+            })
         }).catch(err=>{
             console.log(err)
+            this.setState({
+                loadingTable:false
+            })
         })
     }
     onFinish=(value)=>{
@@ -65,19 +153,15 @@ class DepartmentList extends Component{
             pageSize:10,
             name:value.username
         }
-        
         departmentListApi(result).then(res=>{
-            
             if(res.data.data.data.length > 0){
                 this.setState({
                     dataSource:res.data.data.data
                 })
             }
-            
         }).catch(err=>{
             console.log(err)
         })
-        
     }
     
     checkAllBox=(row)=>{
@@ -85,8 +169,27 @@ class DepartmentList extends Component{
             selectedRowKeys:row
         })
     }
+    okModal=()=>{
+        departmentDeleteApi({id:this.state.id}).then(res=>{
+            message.info(res.data.message)
+            this.setState({
+                visible:false
+            })
+            this.loadData()
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+    hideModal=()=>{
+        this.setState({
+            visible:false
+        })
+    }
+
+    
+
     render(){
-        const { columns } = this.state
+        const { columns,total,batchButton } = this.state
         const rowSelection = {
             onChange:this.checkAllBox
         }
@@ -110,7 +213,21 @@ class DepartmentList extends Component{
                     </Form.Item>
                     
                 </Form> 
-                <Table rowSelection = { rowSelection } rowKey="id" style={{marginTop:"20px"}} columns={columns} dataSource={this.state.dataSource} bordered></Table>       
+                <div className="table-wrap">
+                    <TableComponents batchButton={ batchButton } tableConfig = { this.state.tableConfig } total={total} rowSelection = { rowSelection } columns={this.state.columns} dataSource = {this.state.dataSource}></TableComponents>    
+                    {/* <Table loading = {this.state.loadingTable} rowSelection = { rowSelection } rowKey="id" style={{marginTop:"20px"}} columns={columns} dataSource={this.state.dataSource} bordered></Table>        */}
+                        
+                </div>                    
+                <Modal
+                    title="提示"
+                    visible={this.state.visible}
+                    onOk={this.okModal}
+                    onCancel={this.hideModal}
+                    okText="确认"
+                    cancelText="取消"
+                    >
+                    <p>确认删除该数据?</p>
+               </Modal>        
             </Fragment>    
         );
     }

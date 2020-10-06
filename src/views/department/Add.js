@@ -1,7 +1,7 @@
 import React,{Component} from 'react'
 import { Button, Form, Input,Radio, message} from 'antd';
 
-import { departmentAddApi } from '../../api/department'
+import { departmentAddApi ,departmentDetailApi,departmentEditApi} from '../../api/department'
 
 class DepartmentAdd extends Component{
     constructor(props){
@@ -15,10 +15,42 @@ class DepartmentAdd extends Component{
             name:'',
             status:false,
             number:0,
-            content:''
+            content:'',
+            id:''
         }
     }
+    componentDidMount(){
+        if( this.props.location.state ){
+            this.setState({
+                id:this.props.location.state.id
+            })
+            this.getDetail()
+        }
+        
+    }
+    getDetail=()=>{
+        const result = {
+            id :this.props.location.state.id
+        }
+        if (!this.props.location.state.id) return
+        departmentDetailApi(result).then(res=>{
+            const data = res.data.data
+            this.refs.myForm.setFieldsValue({
+                content: data.content,
+                name: data.name,
+                number: data.number,
+                status: data.status
+            })
+            
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
     onFinish=(value)=>{
+        this.state.id ? this.onHandleEdit(value) : this.onHandleAdd(value)
+    }
+
+    onHandleAdd=(value)=>{
         this.setState({
             loading:true
         })
@@ -34,6 +66,16 @@ class DepartmentAdd extends Component{
                 loading:false
             })
          })
+    }
+
+    onHandleEdit=(value)=>{
+        const result = value
+        result.id = this.props.location.state.id
+        departmentEditApi(value).then(res=>{
+            message.info(res.data.message)
+        }).catch(err=>{
+            console.log(err)
+        })
     }
    
     render(){
