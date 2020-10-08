@@ -6,6 +6,12 @@ import { setToken,setUsername } from '../../utils/cookie'
 import { Form, Input, Button ,Row,Col,message } from 'antd';
 import { UserOutlined, LockOutlined  } from '@ant-design/icons';
 
+// 引入 公用action
+import { userInfo } from '../../store/action'
+
+// 引入 react-redux
+import { connect }  from "react-redux"
+
 // 加密
 import CryptoJs from 'crypto-js'
 
@@ -31,7 +37,6 @@ class Login extends Component{
    
     onFinish = (values) => {
         console.log(values)
-        debugger
         // const result = {
         //     username:this.state.username,
         //     password:CryptoJs.MD5(this.state.password).toString(),
@@ -51,7 +56,7 @@ class Login extends Component{
                 this.setState({
                     loading:false
                 })
-                debugger
+                this.props.saveInfo(res)
                 setToken(res.data.data.token)
                 setUsername(res.data.data.username)
                 this.props.history.push('/index')
@@ -129,4 +134,16 @@ class Login extends Component{
     }
 }
 
-export default withRouter(Login);
+const mapDispatchToProps = (dispatch)=>{
+    return {
+        saveInfo:(res)=>{
+            dispatch({
+                type:userInfo,
+                username:res.data.data.username,
+                token:res.data.data.token
+            })
+        }
+    }
+}
+
+export default connect(null,mapDispatchToProps)(withRouter(Login));

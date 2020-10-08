@@ -8,6 +8,9 @@ import TableComponents from '../../components/tableData/index'
 
 import requestUrl from '../../api/requestUrl'
 
+
+import { connect } from 'react-redux'
+
 class DepartmentList extends Component{
     constructor(props){
         super()
@@ -58,6 +61,7 @@ class DepartmentList extends Component{
     
     componentWillMount(){
         this.loadData()
+        this.props.initData()
     }
     
     onHandleSwitch=(id,status)=>{
@@ -126,7 +130,6 @@ class DepartmentList extends Component{
             loadingTable:true
         })
         departmentListApi(result).then(res=>{
-            
             if(res.data.data.data.length > 0){
                 this.setState({
                     dataSource:res.data.data.data,
@@ -214,10 +217,10 @@ class DepartmentList extends Component{
                     
                 </Form> 
                 <div className="table-wrap">
-                    <TableComponents batchButton={ batchButton } tableConfig = { this.state.tableConfig } total={total} rowSelection = { rowSelection } columns={this.state.columns} dataSource = {this.state.dataSource}></TableComponents>    
+                    <TableComponents deleteAll={this.deleteAll} batchButton={ batchButton } tableConfig = { this.state.tableConfig } total={total} rowSelection = { rowSelection } columns={this.state.columns} dataSource = {this.state.dataSource}></TableComponents>    
                     {/* <Table loading = {this.state.loadingTable} rowSelection = { rowSelection } rowKey="id" style={{marginTop:"20px"}} columns={columns} dataSource={this.state.dataSource} bordered></Table>        */}
                         
-                </div>                    
+                </div>  
                 <Modal
                     title="提示"
                     visible={this.state.visible}
@@ -227,11 +230,36 @@ class DepartmentList extends Component{
                     cancelText="取消"
                     >
                     <p>确认删除该数据?</p>
-               </Modal>        
+               </Modal> 
             </Fragment>    
         );
     }
 }
 
-export default DepartmentList;
+const mapStateToProps = (state)=>({
+    num:state.num,
+    text:state.text,
+    departmentList:state.departmentList,
+    username:state.username,
+    token:state.token
+})
+
+const mapDispatchToProps =(dispatch)=>{
+    return {
+        initData:()=>{
+            departmentListApi({ pageNumber:1,pageSize:10 }).then(res=>{
+                dispatch({
+                    type:'getList',
+                    getData:{
+                        data:res.data.data.data
+                    }    
+                })
+            }).catch(err=>{
+                console.log(err)
+            })
+        }
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(DepartmentList);
 

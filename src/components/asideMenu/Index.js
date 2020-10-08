@@ -55,19 +55,16 @@ class AsideMenu extends Component{
         }
     }
 
-
-
-
     renderSubMenu=({title,key,child})=>{
         // 这个是有二级菜单的  里面还包括了  判断 二级菜单里面是否还有 child 递归调用一下
         return (
             <SubMenu key={key}  title={title}>
-                 {
+                {
                     child&&child.map((item)=>{
                         return item.child&&item.child.length > 0 ?  this.renderSubMenu(item) : this.renderMenu(item)
                     }) 
-                 }
-            </SubMenu>
+                }
+            </SubMenu> 
         )
     }
     renderMenu=(data)=>{

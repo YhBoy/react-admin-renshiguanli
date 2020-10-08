@@ -1,4 +1,1 @@
-export const addTodo = {
-    type: ADD_TODO,
-    text:'这是第一次增加 addTodo'
-}
+export const userInfo = "USER_INFO"

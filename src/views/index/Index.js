@@ -6,6 +6,7 @@ import Aside from './components/Aside'
 //  主体内容组件
 import ContentMain from '../../components/contentMain/index'
 
+import { connect } from "react-redux"
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -32,13 +33,12 @@ class Index extends Component{
                 console.log(collapsed, type);
               }}
             >
-              {/* <div className="logo" /> */}
               <Aside />
-              
-              
             </Sider>
             <Layout >
-              <Header className="site-layout-sub-header-background" style={{ padding: 0 }} />
+              <Header className="site-layout-sub-header-background" style={{ padding: 0 ,color:"#fff"}} >
+                  {this.props.username}
+              </Header>  
               <Content style={{ margin: '24px 16px 0' }}>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: '100%' }}>
                    <ContentMain />
@@ -50,4 +50,8 @@ class Index extends Component{
     }
 }
 
-export default Index;
+const mapStateToProps = (state)=>({
+    username:state.username
+})
+
+export default connect(mapStateToProps,null)(Index);
