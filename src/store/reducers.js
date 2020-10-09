@@ -7,7 +7,7 @@ const defaultState = {
 }
 
 export default (state = defaultState,action)=>{
-    
+    console.log(action)
     switch(action.type){
         case 'getList' :{
             return {
@@ -18,8 +18,8 @@ export default (state = defaultState,action)=>{
         case "userInfo" :{
             return {
                 ...state,
-                token:action.token,
-                username:action.username
+                token:action.userInfoData.token,
+                username:action.userInfoData.username
             }
         }
         default:

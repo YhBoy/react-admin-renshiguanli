@@ -1,7 +1,7 @@
 
 import React,{ Component, Fragment } from 'react'
 import {  Menu } from 'antd';
-// import { UserOutlined  } from '@ant-design/icons';
+import { UserOutlined  } from '@ant-design/icons';
 import Router from '../../routes/index'
 import {Link, withRouter} from 'react-router-dom';
 
@@ -55,12 +55,13 @@ class AsideMenu extends Component{
         }
     }
 
-    renderSubMenu=({title,key,child})=>{
+    renderSubMenu=({title,key,child,icon})=>{
         // 这个是有二级菜单的  里面还包括了  判断 二级菜单里面是否还有 child 递归调用一下
         return (
-            <SubMenu key={key}  title={title}>
+            <SubMenu key={key} icon= {icon}  title={title}>
                 {
                     child&&child.map((item)=>{
+                        
                         return item.child&&item.child.length > 0 ?  this.renderSubMenu(item) : this.renderMenu(item)
                     }) 
                 }
@@ -68,7 +69,7 @@ class AsideMenu extends Component{
         )
     }
     renderMenu=(data)=>{
-        return (<Menu.Item  key={data.key}> <Link to={data.key}> {data.title} </Link></Menu.Item>)
+        return (<Menu.Item   key={data.key} icon={ data.icon}> <Link to={data.key}>    {data.title} </Link></Menu.Item>)
     }
     render(){
         const { selectedKeys , openKeys } = this.state

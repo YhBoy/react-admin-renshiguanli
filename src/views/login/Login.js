@@ -137,10 +137,13 @@ class Login extends Component{
 const mapDispatchToProps = (dispatch)=>{
     return {
         saveInfo:(res)=>{
+            console.log(res)
             dispatch({
-                type:userInfo,
-                username:res.data.data.username,
-                token:res.data.data.token
+                type:"userInfo",
+                userInfoData:{
+                    username:res.data.data.username,
+                    token:res.data.data.token
+                }
             })
         }
     }

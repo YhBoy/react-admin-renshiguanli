@@ -220,7 +220,7 @@ class DepartmentList extends Component{
                     <TableComponents deleteAll={this.deleteAll} batchButton={ batchButton } tableConfig = { this.state.tableConfig } total={total} rowSelection = { rowSelection } columns={this.state.columns} dataSource = {this.state.dataSource}></TableComponents>    
                     {/* <Table loading = {this.state.loadingTable} rowSelection = { rowSelection } rowKey="id" style={{marginTop:"20px"}} columns={columns} dataSource={this.state.dataSource} bordered></Table>        */}
                         
-                </div>  
+                </div> 
                 <Modal
                     title="提示"
                     visible={this.state.visible}
