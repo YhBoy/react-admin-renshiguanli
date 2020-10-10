@@ -2,7 +2,8 @@ import React from 'react'
 import {
     LeftSquareTwoTone,
     EditTwoTone,
-    DeleteTwoTone
+    DeleteTwoTone,
+    FundTwoTone
 } from '@ant-design/icons';
 const router = [
     {
@@ -29,7 +30,7 @@ const router = [
     },
     {
         title:'部门管理',
-        icon:<EditTwoTone />,
+        icon:<FundTwoTone />,
         key:'/index/department',
         child:[
             {title:'部门列表',icon:'',key:'/index/department/list'},
