@@ -13,11 +13,12 @@ class Code extends Component{
             code_button_disabled:false
         }
     }
-
     componentWillReceiveProps(value){
+        
         this.setState({
             username:value.user
         })
+        console.log(this.state.username)
     }
 
     // 销毁组件
@@ -26,13 +27,13 @@ class Code extends Component{
     }
 
     getCode=()=>{
-        
-        if(  !this.state.username ){
+            console.log(this.props.user)
+        if(  !this.props.user ){
                 message.warning('请输入用户名')
                 return;
         }
         const myreg = /^[A-Za-zd0-9]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/;
-        if (!myreg.test(this.state.username)) {
+        if (!myreg.test(this.props.user)) {
             message.warning('用户名输入有误')
             return ;
         }
@@ -41,7 +42,7 @@ class Code extends Component{
             code_button_text:'获取中'
         })
         const resultData = {
-            username:this.state.username,
+            username:this.props.user,
             module:this.props.module
         }
         console.log( this.state.username, this.props.module)

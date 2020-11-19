@@ -5,6 +5,7 @@ import { getToken } from '../../utils/cookie'
 
 const PrivateRouter = ({ component: Component, ...rest }) => {
   console.log(rest) //   这个代表当前路由的 title  url icon 等等信息
+  debugger
   return (
     <Route {...rest} render={routeProps => (
 

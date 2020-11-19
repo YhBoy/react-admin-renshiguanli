@@ -1,68 +1,535 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+=================
+npx create-react-app react-management  创建项目
+npm i antd   
+npm i react-router-dom
 
-In the project directory, you can run:
 
-### `yarn start`
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+引入 antd 
+import { Button } from 'antd'
+引入样式
+import 'antd/dist/antd.css' 在 src/index.js
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+在jsx中 使用  <Button type="primary">按钮</Button>
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+==================
+开始添加路由文件
 
-### `yarn build`
+在app.js中 react路由文件
+import { HashRouter as Router, Switch, Route } from 'react-router-dom'
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+不明白的地方   react route render 渲染路由
+			   props.children  是什么意思	
+			   withRouter 用在什么时候 (使用的时候为什么要包住 组件)	
+			   高阶组件
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
+使用sass 来控制全局样式
+	安装sass-loader和node-sass依赖 
+	npm install sass-loader node-sass --save-dev    (安装完成之后 使用的时候可能会报错  我的解决方法:uninstall node-sass  然后重新安装)
+	
+	
+	
+	
+	使用react命令暴露 react 配置文件 
+	在 504行左右添加
+		npm install sass-loader node-sass --save-dev
+		{
+		  test:/\.scss$/,
+		  loaders:['style-loader','css-loader','sass-loader']
+        }
+	然后重启服务
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+使用scss配置全局变量  (需要安装依赖 安装 sass-resources-loader )
+	大概这样配置 粘贴 .concat 后面的内容就行
+		{
+              test: sassRegex,
+              exclude: sassModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 3,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                },
+                'sass-loader'
+              ).concat({
+                loader:'scss-resources-loader',
+                options:{
+                  resources:[
+                      path.resolve(__dirname,'./../src/styles/main.scss')
+                  ]
+                }
+              }),
+        https://www.jianshu.com/p/ec57dd11c4eb   ( 不懂可以参考这个 )
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+	
+	react 子父组件传值
+		子组件通过方法 (通过事件)
+			onToggle = ()=>{
+				this.props.switchForm('login')
+			}
+		
+		
+		父组件接收  (通过自定义接收)
+			<Login   switchForm = { this.switchForm }   />
+		
+			switchForm = (value)=>{
+				console.log(value)
+			}
+	
+	
+	Form 表单校验 antd版本 4.6
+		1.导出组件的时候 需要 这样导出  export default Form.create()(Login)
+		2.在render 函数里面 需要这样写
+			const { getFieldDecorator } = this.props.form;
+			<Form.Item name="username"  >
+				{getFieldDecorator('username', {
+					rules: [{ required: true, message: '用户名不能为空' }],  // 还可以增加更多的校验条件
+				})(
+					<Input autoComplete="off" prefix={<UserOutlined className="site-form-item-icon" />} placeholder="username" />
+				)}
+			</Form.Item>
+	
+		
+		3.自定义校验规则
+				<Form.Item name="password"  >
+						{getFieldDecorator('password', {
+							rules: [{
+							required: true,
+							message: '请再次输入密码',
+						}, {validator: this.passwordValidator
+						}],
+						})(
+							<Input  prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Password" />
+						)}
+					
+				</Form.Item>
+	
+	
+				passwordValidator =( rule, value, callback )=>{  // 校验函数
+					if (value == '') {
+						callback('密码不能为空')
+					}else{
+						callback();
+					}
+				}
+	
+	
+	
+	配置跨域 (百度搜索react跨域  会有多种跨域解决方案)
+		1.下载依赖 npm install --save-dev http-proxy-middleware
+		2.在 src 下新建 setupProxy.js
+		
+			const { createProxyMiddleware  } = require('http-proxy-middleware');  //注意写法，这是1.0以后的版本，最好按抄
+			module.exports = function (app) {
+				app.use(createProxyMiddleware('/api',
+					{
+						target: 'http://www.web-jshtml.cn/api/react',
+						changeOrigin: true,
+						pathRewrite:{
+							"^/api":''
+						}
+					}
+				));
+			};
+			
+		3. 修改 config/path.js    中 proxySetup路径
+	
+		4. 然后在封装的axios  request.js中   baseURL 为 "/api" 和 setupProxy.js  保持一致
+	 
+			const service = axios.create({
+				baseURL:'/api',
+				timeout:3000
+			})
+	
+	
+	配置打包环境变量: process.env.NODE_ENV  (NODE_ENV是一个由 Node.js 暴露给执行脚本的系统环境变量。通常用于确定在开发环境还是生产环境)
+		在根目录下创建文件: 且文件里面的内容必须为 REACT_APP 开头(比如:  REACT_APP_API="/api" )
+			.env.development (开发)   配置开发环境变量 (  REACT_APP_API="/api"  )
+			.env.test (测试)	      配置开发测试变量 (  REACT_APP_API="/test"  )
+			.env.production(生产)
+		
+		会根据打包命令使用相应的环境变量
+		
+		然后需要在 axios 封装的request.js中 修改一下baseUrl
+			const service = axios.create({
+				baseURL:process.env.REACT_APP_API,
+				timeout:3000
+			})
+	
+		npm install dotenv-cli --save-dev
+		
+		
+		找到  package.json中的 scripts 增加 下面这三行 的打包命令 (可以打包成 开发 生成 测试三个包)
+		"build:dev": "dotenv -e .env.dev react-app-rewired build",
+		"build:production": "dotenv -e .env.production react-app-rewired build",
+		"build:test": "dotenv -e .env.test react-app-rewired build"
+	
+	
+	登录注册获取验证码 倒计时
+		code_button_loading   // 点击发送的时候  还没有返回请求时  loading状态
+		code_button_text	  //  各个状态显示的文字 
+		code_button_disabled  // 根据状态判断按钮是否禁用	
+		
+		
+		获取验证码按钮
+		<Button style={{width:"100%"}} loading={this.state.code_button_loading} disabled={this.state.code_button_disabled}  onClick={this.getCode} type="danger">{this.state.code_button_text}</Button>
+	
+	
+	抽离获取验证码按钮 //  因为注册和登录都有这个验证码按钮 所以进行抽离
+	
+	
+	子组件接收父组件传值可以使用 props 也可以使用生命周期函数  <Code username={this.state.username} />   componentWillReceiveProps(value){}
+	
+	在离开页面的时候关闭定时器  
+		let timer = null
+		命名在 组件前面  import 后面 便于全局获取 timer
+	
+	
+	
+	注册密码加密  import CryptoJs from 'crypto-js'   使用( crypto-js )  // 具体查看文档  了解多种加密方式(入MD5)
+		用法就是 : CryptoJs.MD5(this.state.password).toString()
+	
+	
+	
+	
+	
+	
+	react 要获取浏览器信息  路由之类的 需要 withRouter   ，   withRouter 来自 react-router-dom
+	
+	
+	
+	
+	下面这两组属性在 Form 表单里面   控制 label 和 表单的宽度  是否让在一行显示
+		this.state = {
+			formItem:{
+				labelCol:{span:2},
+				wrapperCol:{span:20}
+			}
+		}
+		
+	
+	
+	
+	使用cookie 存储token  ( 安装 依赖  react-cookie  ||  js-cookie 都可以 )
+		创建 cookie.js    并且引入  import cookies from "react-cookie"
+		export function setToken(value){  // 存储
+				cookies.save('adminToken',value)
+		}
+		export function getToken(){  // 获取  使用load
+			return cookies.load('adminToken')
+		}
+	
+	
+	并且在请求axios里面设置请求头 (请求拦截器)
+	service.interceptors.request.use(function (config) {
+		// 在发送请求之前做些什么
+		
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+		config.headers["Token"] = getToken()
+		config.headers["username"] = getUsername()
+		
+		
+		return config;
+	  }, function (error) {
+		// 对请求错误做些什么
+		return Promise.reject(error);
+	});
+	
+	
+	
+	
+	table  表头自定义渲染数据
+			render:(text,row)=>{
+				return(
+					<div>
+					
+					</div>
+				)
+			}
+	
+	react 传参
+		
+		<Button><Link to={{ pathname:'/index/departmeng/list',state:{ id:10 } }}>编辑</Link></Button>   //  state 传参    参数加密
+		接收: 在componentDidMount(){
+			console.log(this.props.location.state.id)
+		}
+		
+		<Button><Link to={{ pathname:'/index/departmeng/list',state:{ id:10 } }}>编辑</Link></Button>   //  query 传参    刷新页面 参数消息   （ 笔记有点问题 需要重新查阅资料）
+		接收: 在componentDidMount(){
+			console.log(this.props.location.query.id)
+		}
+		
+		
+		<Button><Link to={{ pathname:'/index/departmeng/list',state:{ id:10 } }}>编辑</Link></Button>   //  params 传参  参数会显示在url
+		接收: 在componentDidMount(){
+			console.log(this.props.match.params.id)
+		}
+	
+	
+	类型校验
+	
+	import PropTypes from 'prop-types
+	
+	
+	TableComponents.propTypes = {  // 校验数据类型
+		columns:PropTypes.array,
+		dataSource:PropTypes.array,
+		rowSelection:PropTypes.object
+	}
+	
+	
+	TableComponents.defaultProps = {
+		columns:
+	}
+	
+	
+	
+	
+	Pagination分页
+		点击分页切换
+			<Pagination
+			  total={85}
+			  onChange={(value)=>this.currentPage(value)}
+			  showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
+			  defaultPageSize={20}
+			  defaultCurrent={1}
+			/>
+	
+	currentPage=(value)=>{
+		console.log(value)
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	封装组件 (容器组件和ui组件)
+		方法都写在容器组件(也就是通俗的话父组件)
+		比如table组件
+		( 容器组件 )
+		<Table onChangeCurrantPage = { this.onChangeCurrantPage }></Table>
+		onChangeCurrantPage=(value)={  // 处理分页的 Pagination 的onchange 方法
+			console.log(value)
+		}
+		
+	
+		(UI组件)
+		在render里面接收
+		const { onChangeCurrantPage } = this.props
+		
+		<Pagination
+			defaultCurrent={1}
+			onChange={ onChangeCurrantPage }
+			total={ total }
+			showSizeChanger
+			showQuickJumper
+			showTotal={total => `数据共${total}条`}
+		/>
+	
+	
+	
+	整合 redux 
+		安装redux,react-redux     cnpm install --save redux react-redux
+		
+		项目的入口文件   index.js
+			将store入口文件(index.js) 引入项目的入口文件index.js
+				import { Provider } from 'react-redux';
+				import store from './store';
+				ReactDOM.render(
+					<Provider store={store}>
+						<Todo />
+					</Provider>, 
+					document.getElementById('root')
+			);
+			
+		
+		创建store文件夹
+		
+			1.创建index.js (  store的入口文件  )
+				import { createStore } from 'redux'; 
+				// import { createStore, combineReducers } from 'redux';
+				import todos from './todo/reducer';   // 模块的  reducers.js文件
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+				const store = createStore(todos);
 
-## Learn More
+				/*
+				const store = createStore(    //  combineReducers   合并多个reducers
+				  combineReducers({ todos1, todos2, ... }),
+				);
+				*/
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+				export default store;
+				
+			
+		
+			2.创建 action 
+				let num = 0;
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+				export const addTodo = (text)=>{
+					return {
+						type:'ADD_TODO',
+						id:num ++,
+						text
+					}
+				}
+		
+			3.创建reducer.js文件 
+				const defaultState = {
+					
+				}
+				const todos = (state = defaultState, action) => {
+					switch (action.type) {
+						case 'ADD_TODO':
+							return [
+								...state,
+								{
+									text: action.text,
+									id: action.id,
+									completed: false,
+								}
+							];
+						default :
+							return state;
+					}
+				}
 
-### Code Splitting
+				export default todos;
+			
+			
+			组件结合 mapDispatchToProps
+				import { addTodo } from '../../action';
+				import { connect } from 'react-redux';
+				const mapDispatchToProps = (dispatch) => {
+					return {
+						onAdd: (text) => {
+							dispatch(addTodo(text));
+						}
+					}
+				}
+			
+			// dispatch一个action，所以需要import 这个action
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+			// connect用于连接状态树和组件，来自于react-redux
+			export default connect(null,mapDispatchToProps)(AddTodo);   // AddTodo 组件名
+			
+			
+			组件结合 mapStateToProps  （核心 就是拿值）    mapDispatchToProps（核心就是通过方法修改值）
+			
+			const mapStateToProps = (state)=>({
+				num:state.num
+			})
+			
+			const mapDispatchToProps = (dispatch)=>{
+				return {
+					
+				}
+			}
+			
+			
+			
+		
+		
+		react-redux 
+			属性:
+				mapStateToProps
+				mapDispatchToProps
+				Provider
+				connect  
+				
+		
+	
+	
 
-### Analyzing the Bundle Size
+	
+	
+	
+	
+	
+	================================
+	Form提交表单,提交表单后的清空数据
+	
+	
+	"zxczxczxc@qq.com"
+	zxczxc
+	
+	
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+在src目录下创建  routes 路由目录   创建 mainRoutes 和 adminRoutes
 
-### Making a Progressive Web App
+	** 必须在 路由文件中引入需要的组件
+	import Login from '../pages/Login';
+	import List from '../pages/admin/products/List'
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+	import PageNotFound from '../pages/PageNotFound'
+	import Edit from '../pages/admin/products/Edit'
+	import Index from '../pages/admin/dashboard/index'
+	export const mainRoutes = [
+		{
+			path:'/login',
+			component:Login
+		},
+		{
+			path:'/404',
+			component:PageNotFound
+		}
+	]
 
-### Advanced Configuration
+	export const adminRoutes = [
+		{
+			path:'/admin/dashboard',
+			component:Index
+		},
+		{
+			path:'/admin/products',
+			component:List
+		},
+		{
+			path:'/admin/products/edit/:id',
+			component:Edit
+		}
+	]
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
 
-### Deployment
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
 
-### `yarn build` fails to minify
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+http://jsrun.net/t/xCKKp   学习网站
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
